@@ -62,7 +62,7 @@ class History(BaseModel):
     
 
 class Transacao(BaseModel):
-    _id: str
+    id: str
     resource: str
     status: str
     amount: float

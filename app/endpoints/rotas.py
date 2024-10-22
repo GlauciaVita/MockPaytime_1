@@ -1,6 +1,7 @@
 from concurrent.futures import ThreadPoolExecutor
 import datetime
 import secrets
+import random
 from fastapi import APIRouter, HTTPException, Header, Request
 from app.models.boleto import Boleto
 from app.models.token_cartao import TokenCartao
@@ -13,7 +14,7 @@ client_token_fixed = "testepdv123"
 client_token_access = ""
 client_refresh_token = ""
 store_id_fixed = 10
-transaction_id_fixed = 123
+list_transaction_id = []
 
 @router.post("/oauth")
 async def criarToken(request: Request):
@@ -92,6 +93,8 @@ async def criaTransacao(
     transacao_body: TransacaoBody,
     authorization: str = Header(None)):
     
+    global list_transaction_id
+    
     if storeId != store_id_fixed:
         raise HTTPException(status_code=401, detail="Invalid store id")
 
@@ -100,8 +103,14 @@ async def criaTransacao(
     
     valor_dividido = transacao_body.amount / transacao_body.installment
     
+    id_aleatorio = random.randrange(0,100)
+    print("id",  id_aleatorio)
+    
+    list_transaction_id.append(id_aleatorio)
+    print("lista de ids", list_transaction_id)
+
     transacao = Transacao(
-    id="123",
+    id=str(id_aleatorio),
     resource="payment",
     status="approved",
     amount=int(valor_dividido),
@@ -167,16 +176,21 @@ async def estornaTransacao(
     transactionId: int,
     authorization: str = Header(None)):
     
+    global list_transaction_id
+    
     if storeId != store_id_fixed:
         raise HTTPException(status_code=401, detail="Invalid store id")
     
-    if transactionId != transaction_id_fixed:
-        raise HTTPException(status_code=401, detail="Invalid transaction id")
-
     if authorization != f"Bearer {client_token_access}":
         raise HTTPException(status_code=401, detail="Invalid or missing Authorization token")
     
-    return f"Transação {transaction_id_fixed} estornada com sucesso!"
+    if(transactionId not in list_transaction_id):
+        raise HTTPException(status_code=401, detail="Invalid transaction id")
+    else:
+        list_transaction_id.remove(transactionId)
+        print("lista de ids", list_transaction_id)
+        return f"Transação {transactionId} estornada com sucesso!"
+    
 
 
 @router.post("/stores/{storeId}/billet")
@@ -185,14 +199,21 @@ async def criaBoleto(
     boleto_body: Boleto,
     authorization: str = Header(None)):
     
+    global list_transaction_id
+    
     if storeId != store_id_fixed:
         raise HTTPException(status_code=401, detail="Invalid store id")
 
     if authorization != f"Bearer {client_token_access}":
         raise HTTPException(status_code=401, detail="Invalid or missing Authorization token")
     
+    id_aleatorio = random.randrange(0,100)
+    print("id",  id_aleatorio)
+    list_transaction_id.append(id_aleatorio)
+    print("lista de ids", list_transaction_id)
+    
     billet = Transacao(
-    id="456",
+    id=str(id_aleatorio),
     resource="payment",
     status="approved",
     amount=boleto_body.billet.amount,
