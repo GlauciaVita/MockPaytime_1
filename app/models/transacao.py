@@ -15,7 +15,7 @@ class CardTransacao(BaseModel):
     description: str
 
 class TransacaoBody(BaseModel):
-    amount: int
+    amount: float
     first_name: str
     last_name: str
     document: str

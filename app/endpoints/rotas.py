@@ -113,7 +113,7 @@ async def criaTransacao(
     id=str(id_aleatorio),
     resource="payment",
     status="approved",
-    amount=int(valor_dividido),
+    amount=float(valor_dividido),
     original_amount=transacao_body.amount,
     currency="BRL",
     description="Pagamento de serviço",
