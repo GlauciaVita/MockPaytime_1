@@ -45,11 +45,13 @@ async def refreshToken(request: Request):
     global client_refresh_token 
     
     body = await request.json()
+    print("refresh requisicao", body.get("refresh_token"))
     if body.get("refresh_token") == client_refresh_token:
         token = secrets.token_hex(16)
         refresh_token = secrets.token_hex(32)
         
         client_refresh_token = refresh_token
+        client_token_access = token
         print("refreshtoken salvo", client_refresh_token)
         
         return {
